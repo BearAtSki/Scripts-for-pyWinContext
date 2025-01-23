@@ -84,22 +84,22 @@ save the script as a .bat file before adding it to pyWinContext.
 @echo off
 setlocal enabledelayedexpansion
 
-:: Debugging: Display the clicked file
-echo Debug: Clicked file: %~1
+:: Display the clicked file
+echo Clicked file: %~1
 set "clickedFile=%~1"
 set "dir=%~dp1"
 set "baseName=%~n1"
 set "ext=%~x1"
 
-:: Debugging: Display extracted components
-echo Debug: Directory: %dir%
-echo Debug: Base name: %baseName%
-echo Debug: Extension: %ext%
+:: Display extracted components
+echo Directory: %dir%
+echo Base name: %baseName%
+echo Extension: %ext%
 
 :: Ensure the extension includes the dot
 if not "%ext:~0,1%"=="." (
     set "ext=.ext"
-    echo Debug: Fixed extension to: %ext%
+    echo Fixed extension to: %ext%
 )
 
 :: Initialize variables
@@ -107,7 +107,7 @@ set "digits="
 set "maxDigits=0"
 
 :: Extract digits from the end of the baseName
-echo Debug: Starting to extract digits...
+echo Starting to extract digits...
 for /l %%i in (0,1,255) do (
     set "char=!baseName:~-%%i,1!"
     if not "!char!"=="" if "!char!" geq "0" if "!char!" leq "9" (
@@ -118,11 +118,11 @@ for /l %%i in (0,1,255) do (
 )
 
 :foundDigits
-:: Debugging: Display extracted digits
-echo Debug: Digits extracted: %digits%
+:: Display extracted digits
+echo Digits extracted: %digits%
 
 :: Count the number of digits
-echo Debug: Counting digits...
+echo Counting digits...
 set /a maxDigits=0
 for /l %%i in (0,1,255) do (
     set "char=!digits:~%%i,1!"
@@ -131,40 +131,40 @@ for /l %%i in (0,1,255) do (
     )
 )
 
-:: Debugging: Display maxDigits
-echo Debug: Number of digits: %maxDigits%
+:: Display maxDigits
+echo Number of digits: %maxDigits%
 
 :: Extract prefix (filename before the numbers)
-echo Debug: Extracting prefix...
+echo Extracting prefix...
 set "prefix="
 for /f "tokens=1* delims=0123456789" %%A in ("%baseName%") do set "prefix=%%A"
-echo Debug: Prefix: %prefix%
+echo Prefix: %prefix%
 
 :: Ask user for the desired frame rate
 set "frameRate="
-echo Debug: Asking user for frame rate...
-echo Enter the desired frame rate (e.g., 30, 24, 60):
+echo ------------------------------------------------
+echo Enter the desired frame rate (e.g., 30, 24, 60) or just hit enter for 30 fps
 set /p frameRate="Frame Rate: "
 
-:: Debugging: Display the frame rate before validation
-echo Debug: Frame rate entered: %frameRate%
+:: Display the frame rate before validation
+echo Frame rate entered: %frameRate%
 
 :: Validate frame rate input
 if "%frameRate%"=="" (
-    echo Debug: Invalid input. Using default frame rate of 30.
+    echo Invalid input. Using default frame rate of 30.
     set "frameRate=30"
 )
 
-:: Debugging: Display final frame rate
-echo Debug: Final frame rate: %frameRate%
+:: Display final frame rate
+echo Final frame rate: %frameRate%
 
 :: Construct the sequence pattern
 set "sequencePattern=%dir%%prefix%%%0%maxDigits%d%ext%"
-echo Debug: Sequence pattern constructed: %sequencePattern%
+echo Sequence pattern constructed: %sequencePattern%
 
 :: Validate that files matching the sequence pattern exist
 if not exist "%dir%%prefix%%digits%%ext%" (
-    echo Debug: Error: No files matching the sequence pattern "%sequencePattern%" found.
+    echo Error: No files matching the sequence pattern "%sequencePattern%" found.
     pause
     exit /b 1
 )
@@ -172,22 +172,22 @@ if not exist "%dir%%prefix%%digits%%ext%" (
 :: Output filename
 set "outputFile=%dir%%prefix%.mp4"
 
-:: Debugging: Display output filename
-echo Debug: Output file: %outputFile%
+:: Display output filename
+echo Output file: %outputFile%
 
 :: Run FFmpeg to convert the sequence to MP4
-echo Debug: Running FFmpeg...
+echo Running FFmpeg...
 ffmpeg -framerate %frameRate% -start_number %digits% -i "%sequencePattern%" -c:v libx264 -pix_fmt yuv420p "%outputFile%"
 
 :: Check if FFmpeg ran successfully
 if %errorlevel% equ 0 (
-    echo Debug: Conversion complete! Output saved to: %outputFile%
+    echo Conversion complete! Output saved to: %outputFile%
 ) else (
-    echo Debug: Error during conversion.
+    echo Error during conversion.
 )
 
 :: Pause to keep the window open
-echo Debug: Script complete. Press any key to close.
+echo Script complete. Press any key to close.
 pause
 ```
 
